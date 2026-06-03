@@ -1,6 +1,7 @@
 package com.naveen.WorkForceMgmt.controller;
 
 import com.naveen.WorkForceMgmt.dto.EmployeeDTO;
+import com.naveen.WorkForceMgmt.model.Employee;
 import com.naveen.WorkForceMgmt.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,12 @@ public class EmployeeController {
     EmployeeService employeeService;
 
     @GetMapping
-    public ResponseEntity<List<EmployeeDTO>> getAllEmployees() {
+    public ResponseEntity<List<Employee>> getAllEmployees() {
         return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
     @GetMapping("/{employeeId}")
-    public ResponseEntity<EmployeeDTO> getEmployee(@PathVariable int employeeId) {
+    public ResponseEntity<Employee> getEmployee(@PathVariable Long employeeId) {
         return ResponseEntity.ok(employeeService.getEmployee(employeeId));
     }
 
@@ -33,21 +34,21 @@ public class EmployeeController {
      * MethodArgumentNotValidException, which our GlobalExceptionHandler catches.
      */
     @PostMapping
-    public ResponseEntity<String> createEmployee(@Valid @RequestBody EmployeeDTO emp) {
+    public ResponseEntity<String> createEmployee(@Valid @RequestBody Employee emp) {
         employeeService.createEmployee(emp);
         return ResponseEntity.status(HttpStatus.CREATED).body("Employee created successfully");
     }
 
     @PutMapping("/{employeeId}")
     public ResponseEntity<String> updateEmployee(
-            @PathVariable int employeeId,
-            @Valid @RequestBody EmployeeDTO emp) {
+            @PathVariable Long employeeId,
+            @Valid @RequestBody Employee emp) {
         employeeService.updateEmployee(employeeId, emp);
         return ResponseEntity.ok("Employee updated successfully");
     }
 
     @DeleteMapping("/{employeeId}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable int employeeId) {
+    public ResponseEntity<String> deleteEmployee(@PathVariable Long employeeId) {
         employeeService.deleteEmployee(employeeId);
         return ResponseEntity.ok("Employee deleted successfully");
     }
