@@ -34,16 +34,16 @@ public class EmployeeController {
      * MethodArgumentNotValidException, which our GlobalExceptionHandler catches.
      */
     @PostMapping
-    public ResponseEntity<String> createEmployee(@Valid @RequestBody Employee emp) {
-        employeeService.createEmployee(emp);
+    public ResponseEntity<String> createEmployee(@Valid @RequestBody EmployeeDTO dto) {
+        employeeService.createEmployee(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Employee created successfully");
     }
 
     @PutMapping("/{employeeId}")
     public ResponseEntity<String> updateEmployee(
             @PathVariable Long employeeId,
-            @Valid @RequestBody Employee emp) {
-        employeeService.updateEmployee(employeeId, emp);
+            @Valid @RequestBody EmployeeDTO dto) {
+        employeeService.updateEmployee(employeeId, dto);
         return ResponseEntity.ok("Employee updated successfully");
     }
 

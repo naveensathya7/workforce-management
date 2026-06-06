@@ -16,6 +16,7 @@ public class Employee {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="employee_id")
     private Long id;
 
     @Column(unique = true)
@@ -31,7 +32,7 @@ public class Employee {
 
     private String designation;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="department_id",referencedColumnName = "dep_id")
     private Department department;
 }

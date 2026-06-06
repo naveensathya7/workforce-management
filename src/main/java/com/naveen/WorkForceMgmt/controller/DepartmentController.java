@@ -1,8 +1,9 @@
 package com.naveen.WorkForceMgmt.controller;
 
-
+import com.naveen.WorkForceMgmt.dto.DepartmentDTO;
 import com.naveen.WorkForceMgmt.model.Department;
 import com.naveen.WorkForceMgmt.service.DepartmentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ import java.util.List;
 public class DepartmentController {
 
     @Autowired
-    DepartmentService departmentService;
+    private DepartmentService departmentService;
 
     @GetMapping
     public ResponseEntity<List<Department>> getAllDepartments(){
@@ -28,14 +29,16 @@ public class DepartmentController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createNewDepartment(@RequestBody Department department){
-        departmentService.createNewDepartment(department);
+    public ResponseEntity<String> createNewDepartment(@Valid @RequestBody DepartmentDTO dto){
+        departmentService.createNewDepartment(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Department created successfully");
     }
 
     @PutMapping("/{departmentId}")
-    public ResponseEntity<String> updateDepartment(@PathVariable Long departmentId,@RequestBody Department department){
-        departmentService.updateDepartment(departmentId,department);
+    public ResponseEntity<String> updateDepartment(
+            @PathVariable Long departmentId,
+            @Valid @RequestBody DepartmentDTO dto){
+        departmentService.updateDepartment(departmentId, dto);
         return ResponseEntity.ok("Department updated successfully");
     }
 
@@ -44,8 +47,4 @@ public class DepartmentController {
         departmentService.deleteDepartment(departmentId);
         return ResponseEntity.ok("Department deleted successfully");
     }
-
-
-
-
 }
