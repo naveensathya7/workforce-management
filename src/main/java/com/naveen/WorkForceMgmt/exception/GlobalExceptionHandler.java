@@ -82,6 +82,48 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(DepartmentNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleDepartmentNotFound(
+            DepartmentNotFoundException ex) {
+
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.NOT_FOUND.value(),
+                "Department Not Found",
+                List.of(ex.getMessage()),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleProjectNotFound(
+            ProjectNotFoundException ex) {
+
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.NOT_FOUND.value(),
+                "Project Not Found",
+                List.of(ex.getMessage()),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleTaskNotFound(
+            TaskNotFoundException ex) {
+
+        ErrorResponseDTO error = new ErrorResponseDTO(
+                HttpStatus.NOT_FOUND.value(),
+                "Task Not Found",
+                List.of(ex.getMessage()),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
     /**
      * Catch-all handler for any other unexpected runtime exceptions.
      * Returns 500 Internal Server Error.
