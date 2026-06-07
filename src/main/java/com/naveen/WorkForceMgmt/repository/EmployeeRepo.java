@@ -5,13 +5,14 @@ import com.naveen.WorkForceMgmt.exception.DuplicateEmployeeException;
 import com.naveen.WorkForceMgmt.exception.EmployeeNotFoundException;
 import com.naveen.WorkForceMgmt.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public interface EmployeeRepo extends JpaRepository<Employee,Long> {
+public interface EmployeeRepo extends JpaRepository<Employee,Long>,JpaSpecificationExecutor<Employee> {
 
 //    List<EmployeeDTO> employeeList = new ArrayList<>();
 //

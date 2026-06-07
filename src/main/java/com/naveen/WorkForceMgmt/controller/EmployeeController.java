@@ -1,10 +1,13 @@
 package com.naveen.WorkForceMgmt.controller;
 
 import com.naveen.WorkForceMgmt.dto.EmployeeDTO;
+import com.naveen.WorkForceMgmt.dto.EmployeeFilter;
 import com.naveen.WorkForceMgmt.model.Employee;
 import com.naveen.WorkForceMgmt.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +24,11 @@ public class EmployeeController {
     @GetMapping
     public ResponseEntity<List<Employee>> getAllEmployees() {
         return ResponseEntity.ok(employeeService.getAllEmployees());
+    }
+
+    @GetMapping("/paged")
+    public ResponseEntity<Page<Employee>> getEmployeesPage(EmployeeFilter filter,Pageable pageable){
+        return ResponseEntity.ok(employeeService.getEmployeesPage(filter,pageable));
     }
 
     @GetMapping("/{employeeId}")

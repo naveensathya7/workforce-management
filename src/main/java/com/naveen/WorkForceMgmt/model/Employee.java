@@ -1,6 +1,7 @@
 package com.naveen.WorkForceMgmt.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -34,5 +35,6 @@ public class Employee {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="department_id",referencedColumnName = "dep_id")
+    @JsonIgnore
     private Department department;
 }

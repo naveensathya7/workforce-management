@@ -1,13 +1,19 @@
 package com.naveen.WorkForceMgmt.service;
 
 import com.naveen.WorkForceMgmt.dto.EmployeeDTO;
+import com.naveen.WorkForceMgmt.dto.EmployeeFilter;
 import com.naveen.WorkForceMgmt.exception.DepartmentNotFoundException;
 import com.naveen.WorkForceMgmt.exception.EmployeeNotFoundException;
 import com.naveen.WorkForceMgmt.model.Department;
 import com.naveen.WorkForceMgmt.model.Employee;
 import com.naveen.WorkForceMgmt.repository.DepartmentRepo;
 import com.naveen.WorkForceMgmt.repository.EmployeeRepo;
+import com.naveen.WorkForceMgmt.specification.EmployeeSpecification;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -66,5 +72,10 @@ public class EmployeeService {
 
     public void deleteEmployee(Long empId){
         employeeRepo.deleteById(empId);
+    }
+
+    public Page<Employee> getEmployeesPage(EmployeeFilter filter,Pageable page) {
+        Specification<Employee> spec=EmployeeSpecification.filterBy(filter);
+        return employeeRepo.findAll(spec,page);
     }
 }
