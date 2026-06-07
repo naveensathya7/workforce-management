@@ -4,6 +4,7 @@ import com.naveen.WorkForceMgmt.dto.DepartmentDTO;
 import com.naveen.WorkForceMgmt.exception.DepartmentNotFoundException;
 import com.naveen.WorkForceMgmt.model.Department;
 import com.naveen.WorkForceMgmt.repository.DepartmentRepo;
+import com.naveen.WorkForceMgmt.mapper.DepartmentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,9 @@ public class DepartmentService {
     @Autowired
     private DepartmentRepo departmentRepo;
 
+    @Autowired
+    private DepartmentMapper departmentMapper;
+
     public List<Department> getAllDepartments() {
         return departmentRepo.findAll();
     }
@@ -25,17 +29,14 @@ public class DepartmentService {
     }
 
     public void createNewDepartment(DepartmentDTO dto) {
-        Department department = new Department();
-        department.setName(dto.getName());
-        department.setDescription(dto.getDescription());
+        Department department = departmentMapper.toEntity(dto);
         departmentRepo.save(department);
     }
 
     public void updateDepartment(Long departmentId, DepartmentDTO dto) {
         Department existingDepartment = departmentRepo.findById(departmentId).orElseThrow(() ->
                 new DepartmentNotFoundException(departmentId));
-        existingDepartment.setName(dto.getName());
-        existingDepartment.setDescription(dto.getDescription());
+        departmentMapper.updateDepartmentFromDto(dto, existingDepartment);
         departmentRepo.save(existingDepartment);
     }
 
