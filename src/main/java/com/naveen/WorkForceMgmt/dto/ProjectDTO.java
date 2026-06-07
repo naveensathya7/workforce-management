@@ -3,12 +3,11 @@ package com.naveen.WorkForceMgmt.dto;
 import com.naveen.WorkForceMgmt.enums.ProjectStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -16,18 +15,18 @@ import java.time.LocalDate;
 @Builder
 public class ProjectDTO {
 
-    private Long id;
+  private Long id;
 
-    @NotBlank(message = "Project name is required")
-    private String name;
+  @NotBlank(message = "Project name is required")
+  private String name;
 
-    private String description;
+  private String description;
 
-    @NotNull(message = "Start date is required")
-    private LocalDate startDate;
+  @NotNull(message = "Start date is required")
+  private LocalDate startDate;
 
-    private LocalDate endDate;
+  private LocalDate endDate;
 
-    @NotNull(message = "Project status is required")
-    private ProjectStatus status;
+  @NotNull(message = "Project status is required")
+  private ProjectStatus status;
 }

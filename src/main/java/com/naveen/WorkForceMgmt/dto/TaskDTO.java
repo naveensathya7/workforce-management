@@ -4,12 +4,11 @@ import com.naveen.WorkForceMgmt.enums.TaskPriority;
 import com.naveen.WorkForceMgmt.enums.TaskStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -17,25 +16,25 @@ import java.time.LocalDate;
 @Builder
 public class TaskDTO {
 
-    private Long id;
+  private Long id;
 
-    @NotBlank(message = "Task title is required")
-    private String title;
+  @NotBlank(message = "Task title is required")
+  private String title;
 
-    private String description;
+  private String description;
 
-    @NotNull(message = "Task status is required")
-    private TaskStatus status;
+  @NotNull(message = "Task status is required")
+  private TaskStatus status;
 
-    @NotNull(message = "Task priority is required")
-    private TaskPriority priority;
+  @NotNull(message = "Task priority is required")
+  private TaskPriority priority;
 
-    private LocalDate dueDate;
+  private LocalDate dueDate;
 
-    // IDs only — avoid exposing full nested entities
-    @NotNull(message = "Assigned employee ID is required")
-    private Long assignedEmployeeId;
+  // IDs only — avoid exposing full nested entities
+  @NotNull(message = "Assigned employee ID is required")
+  private Long assignedEmployeeId;
 
-    @NotNull(message = "Project ID is required")
-    private Long projectId;
+  @NotNull(message = "Project ID is required")
+  private Long projectId;
 }

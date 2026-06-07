@@ -1,8 +1,8 @@
 package com.naveen.WorkForceMgmt.enums;
 
 public enum TaskPriority {
-    LOW,
-    MEDIUM,
-    HIGH,
-    CRITICAL
+  LOW,
+  MEDIUM,
+  HIGH,
+  CRITICAL
 }
