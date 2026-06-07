@@ -1,6 +1,9 @@
 package com.naveen.WorkForceMgmt.exception;
 
 import com.naveen.WorkForceMgmt.dto.ErrorResponseDTO;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,6 +17,7 @@ import java.util.List;
  * @ControllerAdvice — makes this class a global handler that intercepts
  * exceptions thrown from ANY controller in the application.
  */
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -33,6 +37,8 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
                 .toList();
+        // Log field validation errors at WARN level
+        log.warn("Validation failed: {}", errorMessages);        
 
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.BAD_REQUEST.value(),
@@ -53,7 +59,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleEmployeeNotFound(
             EmployeeNotFoundException ex) {
 
-        ErrorResponseDTO error = new ErrorResponseDTO(
+        log.warn("Employee not found: {}", ex.getMessage());
+                ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.NOT_FOUND.value(),
                 "Employee Not Found",
                 List.of(ex.getMessage()),
@@ -72,6 +79,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleDuplicateEmployee(
             DuplicateEmployeeException ex) {
 
+                log.warn("Duplicate employee attempt: {}", ex.getMessage());
+
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.CONFLICT.value(),
                 "Duplicate Employee",
@@ -85,6 +94,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DepartmentNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleDepartmentNotFound(
             DepartmentNotFoundException ex) {
+
+                log.warn("Department not found: {}", ex.getMessage());
 
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.NOT_FOUND.value(),
@@ -100,6 +111,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleProjectNotFound(
             ProjectNotFoundException ex) {
 
+                log.warn("Project not found: {}", ex.getMessage());
+
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.NOT_FOUND.value(),
                 "Project Not Found",
@@ -113,6 +126,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TaskNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleTaskNotFound(
             TaskNotFoundException ex) {
+
+                log.warn("Task not found: {}", ex.getMessage());
 
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.NOT_FOUND.value(),
@@ -130,6 +145,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGenericException(Exception ex) {
+
+        log.error("An unexpected error occurred: ", ex);
 
         ErrorResponseDTO error = new ErrorResponseDTO(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
