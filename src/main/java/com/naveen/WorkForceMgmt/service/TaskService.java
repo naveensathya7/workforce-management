@@ -10,6 +10,7 @@ import com.naveen.WorkForceMgmt.model.Task;
 import com.naveen.WorkForceMgmt.repository.EmployeeRepo;
 import com.naveen.WorkForceMgmt.repository.ProjectRepo;
 import com.naveen.WorkForceMgmt.repository.TaskRepo;
+import com.naveen.WorkForceMgmt.mapper.TaskMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,9 @@ public class TaskService {
 
     @Autowired
     private EmployeeRepo employeeRepo;
+
+    @Autowired
+    private TaskMapper taskMapper;
 
     public List<Task> getAllTasks() {
         return taskRepo.findAll();
@@ -52,12 +56,7 @@ public class TaskService {
         Project project = projectRepo.findById(dto.getProjectId())
                 .orElseThrow(() -> new ProjectNotFoundException(dto.getProjectId()));
 
-        Task task = new Task();
-        task.setTitle(dto.getTitle());
-        task.setDescription(dto.getDescription());
-        task.setStatus(dto.getStatus());
-        task.setPriority(dto.getPriority());
-        task.setDueDate(dto.getDueDate());
+        Task task = taskMapper.toEntity(dto);
         task.setAssignedEmployee(employee);
         task.setProject(project);
         taskRepo.save(task);
@@ -73,11 +72,7 @@ public class TaskService {
         Project project = projectRepo.findById(dto.getProjectId())
                 .orElseThrow(() -> new ProjectNotFoundException(dto.getProjectId()));
 
-        existing.setTitle(dto.getTitle());
-        existing.setDescription(dto.getDescription());
-        existing.setStatus(dto.getStatus());
-        existing.setPriority(dto.getPriority());
-        existing.setDueDate(dto.getDueDate());
+        taskMapper.updateTaskFromDto(dto, existing);
         existing.setAssignedEmployee(employee);
         existing.setProject(project);
         taskRepo.save(existing);

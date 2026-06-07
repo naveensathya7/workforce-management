@@ -4,6 +4,7 @@ import com.naveen.WorkForceMgmt.dto.EmployeeDTO;
 import com.naveen.WorkForceMgmt.dto.EmployeeFilter;
 import com.naveen.WorkForceMgmt.exception.DepartmentNotFoundException;
 import com.naveen.WorkForceMgmt.exception.EmployeeNotFoundException;
+import com.naveen.WorkForceMgmt.mapper.EmployeeMapper;
 import com.naveen.WorkForceMgmt.model.Department;
 import com.naveen.WorkForceMgmt.model.Employee;
 import com.naveen.WorkForceMgmt.repository.DepartmentRepo;
@@ -27,6 +28,9 @@ public class EmployeeService {
     @Autowired
     private DepartmentRepo departmentRepo;
 
+    @Autowired
+    private EmployeeMapper employeeMapper;
+
     public List<Employee> getAllEmployees() {
         return employeeRepo.findAll();
     }
@@ -40,13 +44,7 @@ public class EmployeeService {
         Department department = departmentRepo.findById(dto.getDepartmentId())
                 .orElseThrow(() -> new DepartmentNotFoundException(dto.getDepartmentId()));
 
-        Employee employee = new Employee();
-        employee.setEmployeeCode(dto.getEmployeeCode());
-        employee.setFirstName(dto.getFirstName());
-        employee.setLastName(dto.getLastName());
-        employee.setEmail(dto.getEmail());
-        employee.setPhoneNumber(dto.getPhoneNumber());
-        employee.setDesignation(dto.getDesignation());
+        Employee employee = employeeMapper.toEntity(dto);
         employee.setDepartment(department);
 
         employeeRepo.save(employee);
@@ -59,12 +57,7 @@ public class EmployeeService {
         Department department = departmentRepo.findById(dto.getDepartmentId())
                 .orElseThrow(() -> new DepartmentNotFoundException(dto.getDepartmentId()));
 
-        employee.setEmployeeCode(dto.getEmployeeCode());
-        employee.setFirstName(dto.getFirstName());
-        employee.setLastName(dto.getLastName());
-        employee.setEmail(dto.getEmail());
-        employee.setPhoneNumber(dto.getPhoneNumber());
-        employee.setDesignation(dto.getDesignation());
+        employeeMapper.updateEmployeeFromDto(dto,employee);
         employee.setDepartment(department);
 
         employeeRepo.save(employee);

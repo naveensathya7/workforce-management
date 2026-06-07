@@ -2,6 +2,7 @@ package com.naveen.WorkForceMgmt.service;
 
 import com.naveen.WorkForceMgmt.dto.ProjectDTO;
 import com.naveen.WorkForceMgmt.exception.ProjectNotFoundException;
+import com.naveen.WorkForceMgmt.mapper.ProjectMapper;
 import com.naveen.WorkForceMgmt.model.Project;
 import com.naveen.WorkForceMgmt.repository.ProjectRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ public class ProjectService {
     @Autowired
     private ProjectRepo projectRepo;
 
+    @Autowired
+    private ProjectMapper projectMapper;
+
     public List<Project> getAllProjects() {
         return projectRepo.findAll();
     }
@@ -25,12 +29,7 @@ public class ProjectService {
     }
 
     public void createProject(ProjectDTO dto) {
-        Project project = new Project();
-        project.setName(dto.getName());
-        project.setDescription(dto.getDescription());
-        project.setStartDate(dto.getStartDate());
-        project.setEndDate(dto.getEndDate());
-        project.setStatus(dto.getStatus());
+        Project project = projectMapper.toEntity(dto);
         projectRepo.save(project);
     }
 
@@ -38,11 +37,7 @@ public class ProjectService {
         Project existing = projectRepo.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-        existing.setName(dto.getName());
-        existing.setDescription(dto.getDescription());
-        existing.setStartDate(dto.getStartDate());
-        existing.setEndDate(dto.getEndDate());
-        existing.setStatus(dto.getStatus());
+        projectMapper.updateProjectFromDto(dto,existing);
         projectRepo.save(existing);
     }
 
