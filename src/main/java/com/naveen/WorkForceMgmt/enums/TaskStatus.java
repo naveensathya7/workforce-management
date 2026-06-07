@@ -1,9 +1,9 @@
 package com.naveen.WorkForceMgmt.enums;
 
 public enum TaskStatus {
-    TODO,
-    IN_PROGRESS,
-    IN_REVIEW,
-    DONE,
-    CANCELLED
+  TODO,
+  IN_PROGRESS,
+  IN_REVIEW,
+  DONE,
+  CANCELLED
 }

@@ -10,65 +10,63 @@ import com.naveen.WorkForceMgmt.model.Employee;
 import com.naveen.WorkForceMgmt.repository.DepartmentRepo;
 import com.naveen.WorkForceMgmt.repository.EmployeeRepo;
 import com.naveen.WorkForceMgmt.specification.EmployeeSpecification;
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class EmployeeService {
 
-    @Autowired
-    private EmployeeRepo employeeRepo;
+  @Autowired private EmployeeRepo employeeRepo;
 
-    @Autowired
-    private DepartmentRepo departmentRepo;
+  @Autowired private DepartmentRepo departmentRepo;
 
-    @Autowired
-    private EmployeeMapper employeeMapper;
+  @Autowired private EmployeeMapper employeeMapper;
 
-    public List<Employee> getAllEmployees() {
-        return employeeRepo.findAll();
-    }
+  public List<Employee> getAllEmployees() {
+    return employeeRepo.findAll();
+  }
 
-    public Employee getEmployee(Long empId) {
-        return employeeRepo.findById(empId).orElseThrow(() ->
-                new EmployeeNotFoundException(empId));
-    }
+  public Employee getEmployee(Long empId) {
+    return employeeRepo.findById(empId).orElseThrow(() -> new EmployeeNotFoundException(empId));
+  }
 
-    public void createEmployee(EmployeeDTO dto) {
-        Department department = departmentRepo.findById(dto.getDepartmentId())
-                .orElseThrow(() -> new DepartmentNotFoundException(dto.getDepartmentId()));
+  public void createEmployee(EmployeeDTO dto) {
+    Department department =
+        departmentRepo
+            .findById(dto.getDepartmentId())
+            .orElseThrow(() -> new DepartmentNotFoundException(dto.getDepartmentId()));
 
-        Employee employee = employeeMapper.toEntity(dto);
-        employee.setDepartment(department);
+    Employee employee = employeeMapper.toEntity(dto);
+    employee.setDepartment(department);
 
-        employeeRepo.save(employee);
-    }
+    employeeRepo.save(employee);
+  }
 
-    public void updateEmployee(Long empId, EmployeeDTO dto) {
-        Employee employee = employeeRepo.findById(empId).orElseThrow(() ->
-                new EmployeeNotFoundException(empId));
+  public void updateEmployee(Long empId, EmployeeDTO dto) {
+    Employee employee =
+        employeeRepo.findById(empId).orElseThrow(() -> new EmployeeNotFoundException(empId));
 
-        Department department = departmentRepo.findById(dto.getDepartmentId())
-                .orElseThrow(() -> new DepartmentNotFoundException(dto.getDepartmentId()));
+    Department department =
+        departmentRepo
+            .findById(dto.getDepartmentId())
+            .orElseThrow(() -> new DepartmentNotFoundException(dto.getDepartmentId()));
 
-        employeeMapper.updateEmployeeFromDto(dto,employee);
-        employee.setDepartment(department);
+    employeeMapper.updateEmployeeFromDto(dto, employee);
+    employee.setDepartment(department);
 
-        employeeRepo.save(employee);
-    }
+    employeeRepo.save(employee);
+  }
 
-    public void deleteEmployee(Long empId){
-        employeeRepo.deleteById(empId);
-    }
+  public void deleteEmployee(Long empId) {
+    employeeRepo.deleteById(empId);
+  }
 
-    public Page<Employee> getEmployeesPage(EmployeeFilter filter,Pageable page) {
-        Specification<Employee> spec=EmployeeSpecification.filterBy(filter);
-        return employeeRepo.findAll(spec,page);
-    }
+  public Page<Employee> getEmployeesPage(EmployeeFilter filter, Pageable page) {
+    Specification<Employee> spec = EmployeeSpecification.filterBy(filter);
+    return employeeRepo.findAll(spec, page);
+  }
 }

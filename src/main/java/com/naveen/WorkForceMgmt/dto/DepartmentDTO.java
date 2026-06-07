@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DepartmentDTO {
 
-    private Long id;
+  private Long id;
 
-    @NotBlank(message = "Department name is required")
-    private String name;
+  @NotBlank(message = "Department name is required")
+  private String name;
 
-    private String description;
+  private String description;
 }
