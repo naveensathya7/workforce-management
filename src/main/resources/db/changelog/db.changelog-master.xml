@@ -106,5 +106,25 @@
             referencedColumnNames="project_id"
             onDelete="CASCADE"/>
     </changeSet>
+    <changeSet id="1.4-create-audit-logs" author="naveen">
+    <preConditions onFail="MARK_RAN">
+        <not><tableExists tableName="audit_logs"/></not>
+    </preConditions>
+    <createTable tableName="audit_logs">
+        <column name="id" type="bigint" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="action" type="varchar(255)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="details" type="text"/>
+        <column name="performed_by" type="varchar(255)"/>
+        <column name="timestamp" type="timestamp">
+            <constraints nullable="false"/>
+        </column>
+        <column name="execution_time_ms" type="bigint"/>
+    </createTable>
+</changeSet>
+
 
 </databaseChangeLog>
