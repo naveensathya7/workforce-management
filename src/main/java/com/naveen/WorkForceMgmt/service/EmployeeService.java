@@ -1,5 +1,6 @@
 package com.naveen.WorkForceMgmt.service;
 
+import com.naveen.WorkForceMgmt.annotation.Auditable;
 import com.naveen.WorkForceMgmt.dto.EmployeeDTO;
 import com.naveen.WorkForceMgmt.dto.EmployeeFilter;
 import com.naveen.WorkForceMgmt.exception.DepartmentNotFoundException;
@@ -34,6 +35,7 @@ public class EmployeeService {
     return employeeRepo.findById(empId).orElseThrow(() -> new EmployeeNotFoundException(empId));
   }
 
+  @Auditable(action = "CREATE_EMPLOYEE")
   public void createEmployee(EmployeeDTO dto) {
     Department department =
         departmentRepo
