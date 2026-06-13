@@ -5,16 +5,113 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "21642746"
   },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
   "item": [
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\",\n  \"role\": \"ADMIN\",\n  \"employeeId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();\r",
+                  "pm.collectionVariables.set(\"jwt_token\", jsonData.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
     {
       "name": "employee",
       "item": [
         {
           "name": "GetAllEmployees",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -34,9 +131,6 @@
         {
           "name": "GetEmployeeById",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -57,9 +151,6 @@
         {
           "name": "CreateEmployee",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "POST",
             "header": [],
             "body": {
@@ -88,9 +179,6 @@
         {
           "name": "UpdateEmployeeById",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "PUT",
             "header": [],
             "body": {
@@ -120,9 +208,6 @@
         {
           "name": "DeleteEmployeeById",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -148,9 +233,6 @@
         {
           "name": "GetAllDepartments",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -170,9 +252,6 @@
         {
           "name": "GetDepartmentById",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -193,9 +272,6 @@
         {
           "name": "CreateNewDepartment",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "POST",
             "header": [],
             "body": {
@@ -224,9 +300,6 @@
         {
           "name": "UpdateDepartment",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "PUT",
             "header": [],
             "body": {
@@ -256,9 +329,6 @@
         {
           "name": "DeleteDepartmentById",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -284,9 +354,6 @@
         {
           "name": "GetAllProjects",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -306,9 +373,6 @@
         {
           "name": "GetProjectById",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -329,9 +393,6 @@
         {
           "name": "CreateProject",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "POST",
             "header": [],
             "body": {
@@ -360,9 +421,6 @@
         {
           "name": "UpdateProjectById",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "PUT",
             "header": [],
             "body": {
@@ -392,9 +450,6 @@
         {
           "name": "DeleteProjectById",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -420,9 +475,6 @@
         {
           "name": "GetAllTasks",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -442,9 +494,6 @@
         {
           "name": "GetTaskById",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -465,9 +514,6 @@
         {
           "name": "GetTasksByProjectId",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -493,9 +539,6 @@
         {
           "name": "GetTasksByEmployeeId",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "GET",
             "header": [],
             "url": {
@@ -521,9 +564,6 @@
         {
           "name": "CreateTask",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "POST",
             "header": [],
             "body": {
@@ -552,9 +592,6 @@
         {
           "name": "UpdateTaskById",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "PUT",
             "header": [],
             "body": {
@@ -584,9 +621,6 @@
         {
           "name": "DeleteTaskById",
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "DELETE",
             "header": [],
             "url": {

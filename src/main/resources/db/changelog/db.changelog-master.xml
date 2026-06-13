@@ -1,130 +1,180 @@
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <!-- ==================== 1.0: departments ==================== -->
-    <changeSet id="1.0-create-departments" author="naveen">
-        <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="departments"/></not>
-        </preConditions>
-        <createTable tableName="departments">
-            <column name="dep_id" type="bigint" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="description" type="text"/>
-        </createTable>
-    </changeSet>
+	<!-- ==================== 1.0: departments ==================== -->
+	<changeSet id="1.0-create-departments" author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="departments" />
+			</not>
+		</preConditions>
+		<createTable tableName="departments">
+			<column name="dep_id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="name" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="text" />
+		</createTable>
+	</changeSet>
 
-    <!-- ==================== 1.1: employees ==================== -->
-    <changeSet id="1.1-create-employees" author="naveen">
-        <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="employees"/></not>
-        </preConditions>
-        <createTable tableName="employees">
-            <column name="employee_id" type="bigint" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="employee_code" type="varchar(255)">
-                <constraints unique="true"/>
-            </column>
-            <column name="first_name" type="varchar(255)"/>
-            <column name="last_name" type="varchar(255)"/>
-            <column name="email" type="varchar(255)"/>
-            <column name="phone_number" type="varchar(255)"/>
-            <column name="designation" type="varchar(255)"/>
-            <column name="department_id" type="bigint"/>
-        </createTable>
-        <addForeignKeyConstraint
-            constraintName="fk_employee_department"
-            baseTableName="employees"
-            baseColumnNames="department_id"
-            referencedTableName="departments"
-            referencedColumnNames="dep_id"
-            onDelete="SET NULL"/>
-    </changeSet>
+	<!-- ==================== 1.1: employees ==================== -->
+	<changeSet id="1.1-create-employees" author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="employees" />
+			</not>
+		</preConditions>
+		<createTable tableName="employees">
+			<column name="employee_id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="employee_code" type="varchar(255)">
+				<constraints unique="true" />
+			</column>
+			<column name="first_name" type="varchar(255)" />
+			<column name="last_name" type="varchar(255)" />
+			<column name="email" type="varchar(255)" />
+			<column name="phone_number" type="varchar(255)" />
+			<column name="designation" type="varchar(255)" />
+			<column name="department_id" type="bigint" />
+		</createTable>
+		<addForeignKeyConstraint
+			constraintName="fk_employee_department" baseTableName="employees"
+			baseColumnNames="department_id" referencedTableName="departments"
+			referencedColumnNames="dep_id" onDelete="SET NULL" />
+	</changeSet>
 
-    <!-- ==================== 1.2: projects ==================== -->
-    <changeSet id="1.2-create-projects" author="naveen">
-        <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="projects"/></not>
-        </preConditions>
-        <createTable tableName="projects">
-            <column name="project_id" type="bigint" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="varchar(255)"/>
-            <column name="description" type="text"/>
-            <column name="start_date" type="date"/>
-            <column name="end_date" type="date"/>
-            <column name="status" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_at" type="timestamp"/>
-            <column name="updated_at" type="timestamp"/>
-        </createTable>
-    </changeSet>
+	<!-- ==================== 1.2: projects ==================== -->
+	<changeSet id="1.2-create-projects" author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="projects" />
+			</not>
+		</preConditions>
+		<createTable tableName="projects">
+			<column name="project_id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="name" type="varchar(255)" />
+			<column name="description" type="text" />
+			<column name="start_date" type="date" />
+			<column name="end_date" type="date" />
+			<column name="status" type="varchar(50)">
+				<constraints nullable="false" />
+			</column>
+			<column name="created_at" type="timestamp" />
+			<column name="updated_at" type="timestamp" />
+		</createTable>
+	</changeSet>
 
-    <!-- ==================== 1.3: tasks ==================== -->
-    <changeSet id="1.3-create-tasks" author="naveen">
-        <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="tasks"/></not>
-        </preConditions>
-        <createTable tableName="tasks">
-            <column name="task_id" type="bigint" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="title" type="varchar(255)"/>
-            <column name="description" type="text"/>
-            <column name="status" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="priority" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="due_date" type="date"/>
-            <column name="employee_id" type="bigint"/>
-            <column name="project_id" type="bigint"/>
-            <column name="created_at" type="timestamp"/>
-            <column name="updated_at" type="timestamp"/>
-        </createTable>
-        <addForeignKeyConstraint
-            constraintName="fk_task_employee"
-            baseTableName="tasks"
-            baseColumnNames="employee_id"
-            referencedTableName="employees"
-            referencedColumnNames="employee_id"
-            onDelete="SET NULL"/>
-        <addForeignKeyConstraint
-            constraintName="fk_task_project"
-            baseTableName="tasks"
-            baseColumnNames="project_id"
-            referencedTableName="projects"
-            referencedColumnNames="project_id"
-            onDelete="CASCADE"/>
-    </changeSet>
-    <changeSet id="1.4-create-audit-logs" author="naveen">
-    <preConditions onFail="MARK_RAN">
-        <not><tableExists tableName="audit_logs"/></not>
-    </preConditions>
-    <createTable tableName="audit_logs">
-        <column name="id" type="bigint" autoIncrement="true">
-            <constraints primaryKey="true" nullable="false"/>
-        </column>
-        <column name="action" type="varchar(255)">
-            <constraints nullable="false"/>
-        </column>
-        <column name="details" type="text"/>
-        <column name="performed_by" type="varchar(255)"/>
-        <column name="timestamp" type="timestamp">
-            <constraints nullable="false"/>
-        </column>
-        <column name="execution_time_ms" type="bigint"/>
-    </createTable>
-</changeSet>
+	<!-- ==================== 1.3: tasks ==================== -->
+	<changeSet id="1.3-create-tasks" author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="tasks" />
+			</not>
+		</preConditions>
+		<createTable tableName="tasks">
+			<column name="task_id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="title" type="varchar(255)" />
+			<column name="description" type="text" />
+			<column name="status" type="varchar(50)">
+				<constraints nullable="false" />
+			</column>
+			<column name="priority" type="varchar(50)">
+				<constraints nullable="false" />
+			</column>
+			<column name="due_date" type="date" />
+			<column name="employee_id" type="bigint" />
+			<column name="project_id" type="bigint" />
+			<column name="created_at" type="timestamp" />
+			<column name="updated_at" type="timestamp" />
+		</createTable>
+		<addForeignKeyConstraint
+			constraintName="fk_task_employee" baseTableName="tasks"
+			baseColumnNames="employee_id" referencedTableName="employees"
+			referencedColumnNames="employee_id" onDelete="SET NULL" />
+		<addForeignKeyConstraint
+			constraintName="fk_task_project" baseTableName="tasks"
+			baseColumnNames="project_id" referencedTableName="projects"
+			referencedColumnNames="project_id" onDelete="CASCADE" />
+	</changeSet>
+	<changeSet id="1.4-create-audit-logs" author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="audit_logs" />
+			</not>
+		</preConditions>
+		<createTable tableName="audit_logs">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="action" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="details" type="text" />
+			<column name="performed_by" type="varchar(255)" />
+			<column name="timestamp" type="timestamp">
+				<constraints nullable="false" />
+			</column>
+			<column name="execution_time_ms" type="bigint" />
+		</createTable>
+	</changeSet>
+	<!-- ==================== 1.5: users ==================== -->
+	<changeSet id="1.5-create-users" author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="users" />
+			</not>
+		</preConditions>
+		<createTable tableName="users">
+			<column name="user_id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="username" type="varchar(255)">
+				<constraints nullable="false" unique="true" />
+			</column>
+			<column name="password" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="role" type="varchar(50)">
+				<constraints nullable="false" />
+			</column>
+			<column name="employee_id" type="bigint">
+				<constraints unique="true" />
+			</column>
+			<column name="is_enabled" type="boolean"
+				defaultValueBoolean="true">
+				<constraints nullable="false" />
+			</column>
+			<column name="is_credentials_non_expired" type="boolean"
+				defaultValueBoolean="true">
+				<constraints nullable="false" />
+			</column>
+			<column name="is_account_non_locked" type="boolean"
+				defaultValueBoolean="true">
+				<constraints nullable="false" />
+			</column>
+			<column name="is_account_non_expired" type="boolean"
+				defaultValueBoolean="true">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+
+		<!-- Link users to employees (One-to-One FK) -->
+		<addForeignKeyConstraint
+			constraintName="fk_user_employee" baseTableName="users"
+			baseColumnNames="employee_id" referencedTableName="employees"
+			referencedColumnNames="employee_id" onDelete="CASCADE" />
+	</changeSet>
+
 
 
 </databaseChangeLog>
