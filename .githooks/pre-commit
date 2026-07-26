@@ -1,0 +1,17 @@
+#!/bin/sh
+# Git pre-commit hook: Auto-formats code with Spotless before every commit
+
+echo "Running Spotless auto-formatter..."
+
+# Run spotless:apply via Maven Wrapper
+./mvnw spotless:apply
+
+if [ $? -ne 0 ]; then
+    echo "Spotless formatting failed!"
+    exit 1
+fi
+
+# Re-stage formatted files
+git add -u
+
+echo "Code formatted successfully!"

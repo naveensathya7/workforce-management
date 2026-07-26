@@ -10,15 +10,17 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
-  private static final String SECRET_KEY =
-      "3cfa76ef14937c1c0ea519f8fc0edcd020f24e9cb4e73dbd6e7f2cf19cf4bc67";
+  @Value("${jwt.secret-key}")
+  private String SECRET_KEY;
 
-  private static final long JWT_EXPIRATION = 1000 * 60 * 60 * 24;
+  @Value("${jwt.expiration-ms}")
+  private long JWT_EXPIRATION;
 
   public String generateToken(UserDetails userDetails) {
     return generateToken(new HashMap<>(), userDetails);
