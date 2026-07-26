@@ -128,6 +128,45 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Triggered when authentication fails due to incorrect username or password. Returns 401
+   * Unauthorized instead of 500 Internal Server Error.
+   */
+  @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+  public ResponseEntity<ErrorResponseDTO> handleBadCredentials(
+      org.springframework.security.authentication.BadCredentialsException ex) {
+
+    log.warn("Authentication failed: Invalid username or password");
+
+    ErrorResponseDTO error =
+        new ErrorResponseDTO(
+            HttpStatus.UNAUTHORIZED.value(),
+            "Authentication Failed",
+            List.of("Invalid username or password"),
+            LocalDateTime.now());
+
+    return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+  }
+
+  /**
+   * Triggered when user account is disabled/banned (is_enabled = false). Returns 401 Unauthorized.
+   */
+  @ExceptionHandler(org.springframework.security.authentication.DisabledException.class)
+  public ResponseEntity<ErrorResponseDTO> handleDisabledAccount(
+      org.springframework.security.authentication.DisabledException ex) {
+
+    log.warn("Authentication failed: Account is disabled");
+
+    ErrorResponseDTO error =
+        new ErrorResponseDTO(
+            HttpStatus.UNAUTHORIZED.value(),
+            "Account Disabled",
+            List.of("User account is disabled. Please contact administrator."),
+            LocalDateTime.now());
+
+    return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+  }
+
+  /**
    * Catch-all handler for any other unexpected runtime exceptions. Returns 500 Internal Server
    * Error.
    */
