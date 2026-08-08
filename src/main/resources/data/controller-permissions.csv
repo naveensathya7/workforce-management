@@ -1,0 +1,14 @@
+role,controller,methods
+ADMIN,AuthController,*
+ADMIN,EmployeeController,*
+MANAGER,EmployeeController,"getAllEmployees,getEmployeesPage,getEmployee,createEmployee,updateEmployee"
+EMPLOYEE,EmployeeController,getEmployee
+ADMIN,DepartmentController,*
+MANAGER,DepartmentController,"getAllDepartments,getDepartment"
+EMPLOYEE,DepartmentController,"getAllDepartments,getDepartment"
+ADMIN,ProjectController,*
+MANAGER,ProjectController,*
+EMPLOYEE,ProjectController,"getAllProjects,getProject"
+ADMIN,TaskController,*
+MANAGER,TaskController,*
+EMPLOYEE,TaskController,"getTask,getTasksByProject,getTasksByEmployee"

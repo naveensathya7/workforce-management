@@ -1,7 +1,6 @@
 package com.naveen.WorkForceMgmt.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.naveen.WorkForceMgmt.enums.Role;
 import jakarta.persistence.*;
 import java.util.Collection;
 import java.util.List;
@@ -48,8 +47,8 @@ public class User implements UserDetails {
   private String password;
 
   /** Role drives what endpoints this user can access. */
-  @Enumerated(EnumType.STRING)
-  @Column(name = "role", nullable = false)
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "role_id", nullable = false)
   private Role role;
 
   /**
@@ -116,7 +115,7 @@ public class User implements UserDetails {
    */
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    return List.of(new SimpleGrantedAuthority("ROLE_" + role.getName()));
   }
 
   /**
