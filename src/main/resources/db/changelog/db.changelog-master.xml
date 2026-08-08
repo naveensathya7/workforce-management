@@ -174,7 +174,140 @@
 			baseColumnNames="employee_id" referencedTableName="employees"
 			referencedColumnNames="employee_id" onDelete="CASCADE" />
 	</changeSet>
+	<changeSet id="1.6-create-roles-table" author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="roles" />
+			</not>
+		</preConditions>
+		<createTable tableName="roles">
+			<column name="role_id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="name" type="varchar(50)">
+				<constraints nullable="false" unique="true" />
+			</column>
+			<column name="description" type="text" />
+		</createTable>
+	</changeSet>
 
+	<changeSet id="1.6-insert-roles" author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="roles" />
+		</preConditions>
+		<loadData tableName="roles" file="data/roles.csv"
+			relativeToChangelogFile="false" separator="," encoding="UTF-8">
+			<column name="role_id" header="id" type="NUMERIC" />
+			<column name="name" header="name" type="STRING" />
+			<column name="description" header="description" type="STRING" />
+		</loadData>
+	</changeSet>
 
+	<changeSet id="1.7-create-role-method-permissions"
+		author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="role_method_permissions" />
+			</not>
+		</preConditions>
+		<createTable tableName="role_method_permissions">
+			<column name="id" type="bigint" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false" />
+			</column>
+			<column name="role_id" type="bigint">
+				<constraints nullable="false" />
+			</column>
+			<column name="controller" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="methods" type="text">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+
+		<addForeignKeyConstraint
+			constraintName="fk_permission_role"
+			baseTableName="role_method_permissions" baseColumnNames="role_id"
+			referencedTableName="roles" referencedColumnNames="role_id"
+			onDelete="CASCADE" />
+	</changeSet>
+
+	<changeSet id="1.8-update-users-role-fk" author="naveen">
+		<validCheckSum>9:5d5902dff3543c3fd7758e2d97d1c8d1</validCheckSum>
+
+		<!-- Add role_id column to users -->
+		<addColumn tableName="users">
+			<column name="role_id" type="bigint" />
+		</addColumn>
+
+		<!-- Migrate existing data: map string 'role' to 'roles.role_id' -->
+		<!-- PostgreSQL specific syntax -->
+		<sqlFile dbms="postgresql"
+			path="sql/1.8-migrate-roles.postgres.sql"
+			relativeToChangelogFile="true" />
+
+		<!-- MySQL specific syntax -->
+		<sqlFile dbms="mysql" path="sql/1.8-migrate-roles.mysql.sql"
+			relativeToChangelogFile="true" />
+
+		<!-- Drop old role column -->
+		<dropColumn tableName="users" columnName="role" />
+
+		<!-- Add foreign key constraint to roles -->
+		<addForeignKeyConstraint
+			constraintName="fk_user_role" baseTableName="users"
+			baseColumnNames="role_id" referencedTableName="roles"
+			referencedColumnNames="role_id" onDelete="RESTRICT" />
+	</changeSet>
+
+	<!-- PostgreSQL specific trigger -->
+	<changeSet id="1.9-add-users-audit-trigger" author="naveen"
+		dbms="postgresql">
+		<sqlFile path="sql/1.9-audit-trigger.postgres.sql"
+			relativeToChangelogFile="true" splitStatements="false" />
+	</changeSet>
+
+	<!-- MySQL specific trigger -->
+	<changeSet id="1.9-add-users-audit-trigger-mysql"
+		author="naveen" dbms="mysql">
+		<sqlFile path="sql/1.9-audit-trigger.mysql.sql"
+			relativeToChangelogFile="true" splitStatements="false" />
+	</changeSet>
+
+	<changeSet id="1.10-seed-role-permissions" author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<rowCount expectedRows="0"
+				tableName="role_method_permissions" />
+		</preConditions>
+
+		<!-- Create temporary table to hold raw CSV data -->
+		<createTable tableName="temp_permissions">
+			<column name="role_name" type="varchar(50)" />
+			<column name="controller" type="varchar(255)" />
+			<column name="methods" type="text" />
+		</createTable>
+
+		<!-- Load CSV data into the temporary table -->
+		<loadData tableName="temp_permissions"
+			file="data/controller-permissions.csv"
+			relativeToChangelogFile="false" separator="," encoding="UTF-8">
+			<column name="role_name" header="role" type="STRING" />
+			<column name="controller" header="controller" type="STRING" />
+			<column name="methods" header="methods" type="STRING" />
+		</loadData>
+
+		<!-- Insert into the actual table by looking up the role_id -->
+		<sql>
+			INSERT INTO role_method_permissions (role_id, controller,
+			methods)
+			SELECT r.role_id, t.controller, t.methods
+			FROM
+			temp_permissions t
+			JOIN roles r ON r.name = t.role_name;
+		</sql>
+
+		<!-- Clean up the temporary table -->
+		<dropTable tableName="temp_permissions" />
+	</changeSet>
 
 </databaseChangeLog>

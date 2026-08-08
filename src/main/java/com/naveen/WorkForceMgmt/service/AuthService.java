@@ -6,8 +6,10 @@ import com.naveen.WorkForceMgmt.dto.LoginRequest;
 import com.naveen.WorkForceMgmt.dto.RegisterRequest;
 import com.naveen.WorkForceMgmt.dto.ResetPasswordRequest;
 import com.naveen.WorkForceMgmt.model.Employee;
+import com.naveen.WorkForceMgmt.model.Role;
 import com.naveen.WorkForceMgmt.model.User;
 import com.naveen.WorkForceMgmt.repository.EmployeeRepo;
+import com.naveen.WorkForceMgmt.repository.RoleRepository;
 import com.naveen.WorkForceMgmt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,6 +31,7 @@ public class AuthService {
   private final JwtService jwtService;
   private final EmployeeRepo employeeRepository;
   private final UserRepository userRepository;
+  private final RoleRepository roleRepository;
   private final PasswordEncoder passwordEncoder;
 
   public AuthResponse login(LoginRequest request) {
@@ -49,11 +52,16 @@ public class AuthService {
                 () ->
                     new RuntimeException("Employee not found with ID: " + request.getEmployeeId()));
 
+    Role role =
+        roleRepository
+            .findByName(request.getRoleName())
+            .orElseThrow(() -> new RuntimeException("Role not found: " + request.getRoleName()));
+
     User user =
         User.builder()
             .username(request.getUsername())
             .password(passwordEncoder.encode(request.getPassword()))
-            .role(request.getRole())
+            .role(role)
             .employee(employee)
             .build();
 
