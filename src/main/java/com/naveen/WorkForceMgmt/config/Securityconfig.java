@@ -1,6 +1,7 @@
 package com.naveen.WorkForceMgmt.config;
 
 import com.naveen.WorkForceMgmt.filter.JwtAuthFilter;
+import com.naveen.WorkForceMgmt.filter.RateLimiterFilter;
 import com.naveen.WorkForceMgmt.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ public class Securityconfig {
 
   private final UserDetailsServiceImpl userDetailsServiceImpl;
   private final JwtAuthFilter jwtAuthFilter;
+  private final RateLimiterFilter rateLimiterFilter;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -45,6 +47,7 @@ public class Securityconfig {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider())
+        .addFilterBefore(rateLimiterFilter, UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
