@@ -3,9 +3,11 @@ package com.naveen.WorkForceMgmt.service;
 import com.naveen.WorkForceMgmt.dto.AuthResponse;
 import com.naveen.WorkForceMgmt.dto.ChangePasswordRequest;
 import com.naveen.WorkForceMgmt.dto.LoginRequest;
+import com.naveen.WorkForceMgmt.dto.RefreshTokenRequest;
 import com.naveen.WorkForceMgmt.dto.RegisterRequest;
 import com.naveen.WorkForceMgmt.dto.ResetPasswordRequest;
 import com.naveen.WorkForceMgmt.model.Employee;
+import com.naveen.WorkForceMgmt.model.RefreshToken;
 import com.naveen.WorkForceMgmt.model.Role;
 import com.naveen.WorkForceMgmt.model.User;
 import com.naveen.WorkForceMgmt.repository.EmployeeRepo;
@@ -33,6 +35,7 @@ public class AuthService {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final PasswordEncoder passwordEncoder;
+  private final RefreshTokenService refreshTokenService;
 
   public AuthResponse login(LoginRequest request) {
     authenticationManager.authenticate(
@@ -40,7 +43,16 @@ public class AuthService {
 
     final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
     final String jwtToken = jwtService.generateToken(userDetails);
-    return new AuthResponse(jwtToken);
+    final User user =
+        userRepository
+            .findByUsername(userDetails.getUsername())
+            .orElseThrow(
+                () ->
+                    new RuntimeException(
+                        "User not found with username: " + userDetails.getUsername()));
+    final RefreshToken refreshToken =
+        refreshTokenService.createRefreshToken(user, request.getDeviceId());
+    return new AuthResponse(jwtToken, refreshToken.getToken());
   }
 
   @Transactional
@@ -82,6 +94,24 @@ public class AuthService {
 
     user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     userRepository.save(user);
+  }
+
+  @Transactional
+  public AuthResponse refreshToken(RefreshTokenRequest request) {
+    RefreshToken refreshToken =
+        refreshTokenService
+            .findByToken(request.getRefreshToken())
+            .orElseThrow(() -> new RuntimeException("No Refresh token details found"));
+    if (refreshToken.isRevoked()) {
+      throw new RuntimeException("Refresh token is revoked");
+    }
+    refreshTokenService.verifyExpiration(refreshToken);
+    User user = refreshToken.getUser();
+    String jwtToken = jwtService.generateToken(user);
+    // 3. Rotate: Delete old refresh token & generate a brand-new Refresh Token
+    RefreshToken newRefreshToken =
+        refreshTokenService.createRefreshToken(user, refreshToken.getDeviceId());
+    return new AuthResponse(jwtToken, newRefreshToken.getToken());
   }
 
   @Transactional

@@ -339,4 +339,22 @@
 			referencedColumnNames="user_id" onDelete="CASCADE" />
 	</changeSet>
 
+	<changeSet id="1.12-add-device-id-to-refresh-tokens"
+		author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="refresh_tokens"
+					columnName="device_id" />
+			</not>
+		</preConditions>
+		<addColumn tableName="refresh_tokens">
+			<column name="device_id" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+		<addUniqueConstraint
+			constraintName="uq_refresh_token_user_device"
+			tableName="refresh_tokens" columnNames="user_id,device_id" />
+	</changeSet>
+
 </databaseChangeLog>

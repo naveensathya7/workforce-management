@@ -3,6 +3,7 @@ package com.naveen.WorkForceMgmt.controller;
 import com.naveen.WorkForceMgmt.dto.AuthResponse;
 import com.naveen.WorkForceMgmt.dto.ChangePasswordRequest;
 import com.naveen.WorkForceMgmt.dto.LoginRequest;
+import com.naveen.WorkForceMgmt.dto.RefreshTokenRequest;
 import com.naveen.WorkForceMgmt.dto.RegisterRequest;
 import com.naveen.WorkForceMgmt.dto.ResetPasswordRequest;
 import com.naveen.WorkForceMgmt.service.AuthService;
@@ -44,6 +45,12 @@ public class AuthController {
       Principal principal, @Valid @RequestBody ChangePasswordRequest request) {
     authService.changePassword(principal.getName(), request);
     return ResponseEntity.ok("Password changed successfully");
+  }
+
+  @PostMapping("/refresh-token")
+  public ResponseEntity<AuthResponse> refreshToken(
+      @Valid @RequestBody RefreshTokenRequest request) {
+    return ResponseEntity.ok(authService.refreshToken(request));
   }
 
   /** ADMIN users can reset the password for any given user. */
