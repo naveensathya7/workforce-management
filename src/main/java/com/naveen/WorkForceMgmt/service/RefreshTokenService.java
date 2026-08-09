@@ -57,4 +57,9 @@ public class RefreshTokenService {
   public void deleteByUser(User user) {
     refreshTokenRepository.deleteByUser(user);
   }
+
+  @Transactional
+  public void deleteByToken(String refreshToken) {
+    refreshTokenRepository.deleteByToken(refreshToken);
+  }
 }

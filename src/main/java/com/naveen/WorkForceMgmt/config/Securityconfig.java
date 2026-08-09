@@ -43,7 +43,8 @@ public class Securityconfig {
     http.csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/api/auth/login", "/api/auth/refresh-token")
+                auth.requestMatchers(
+                        "/api/auth/login", "/api/auth/refresh-token", "/api/auth/logout")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
