@@ -274,13 +274,27 @@
 			relativeToChangelogFile="true" splitStatements="false" />
 	</changeSet>
 
-	<changeSet id="1.10-seed-role-permissions" author="naveen">
+	<!-- Required before 1.10 so its ON CONFLICT upsert has a constraint to
+		match against -->
+	<changeSet id="1.10.0-add-unique-role-controller-constraint"
+		author="naveen">
 		<preConditions onFail="MARK_RAN">
-			<rowCount expectedRows="0"
-				tableName="role_method_permissions" />
+			<not>
+				<indexExists indexName="uq_role_controller" />
+			</not>
 		</preConditions>
+		<addUniqueConstraint
+			constraintName="uq_role_controller"
+			tableName="role_method_permissions" columnNames="role_id,controller" />
+	</changeSet>
 
-		<!-- Create temporary table to hold raw CSV data -->
+	<changeSet id="1.10-seed-role-permissions" author="naveen"
+		runOnChange="true">
+
+		<!-- Recreate temp table each run so a re-run (triggered by an edited CSV)
+			starts clean -->
+		<sql>DROP TABLE IF EXISTS temp_permissions;</sql>
+
 		<createTable tableName="temp_permissions">
 			<column name="role_name" type="varchar(50)" />
 			<column name="controller" type="varchar(255)" />
@@ -296,14 +310,22 @@
 			<column name="methods" header="methods" type="STRING" />
 		</loadData>
 
-		<!-- Insert into the actual table by looking up the role_id -->
+		<!-- Upsert into the actual table by looking up the role_id. ON CONFLICT
+			requires the uq_role_controller unique constraint (see 1.10.0) and is what
+			makes this changeset safe to re-run via runOnChange when the CSV is edited:
+			existing (role_id, controller) rows get their methods updated instead of
+			erroring on a duplicate insert. Note this only adds/updates rows present
+			in the CSV — a row removed from the CSV is NOT deleted from the table. -->
 		<sql>
 			INSERT INTO role_method_permissions (role_id, controller,
 			methods)
 			SELECT r.role_id, t.controller, t.methods
 			FROM
 			temp_permissions t
-			JOIN roles r ON r.name = t.role_name;
+			JOIN roles r ON r.name = t.role_name
+			ON CONFLICT
+			(role_id, controller)
+			DO UPDATE SET methods = EXCLUDED.methods;
 		</sql>
 
 		<!-- Clean up the temporary table -->
@@ -356,5 +378,22 @@
 			constraintName="uq_refresh_token_user_device"
 			tableName="refresh_tokens" columnNames="user_id,device_id" />
 	</changeSet>
+
+	<changeSet id="1.13-add-token-version-to-users"
+		author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="users"
+					columnName="token_version" />
+			</not>
+		</preConditions>
+		<addColumn tableName="users">
+			<column name="token_version" type="int"
+				defaultValueNumeric="0">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
+
 
 </databaseChangeLog>

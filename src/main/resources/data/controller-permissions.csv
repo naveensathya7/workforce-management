@@ -1,5 +1,7 @@
 role,controller,methods
 ADMIN,AuthController,*
+MANAGER,AuthController,"changePassword,logout,refreshToken"
+EMPLOYEE,AuthController,"changePassword,logout,refreshToken"
 ADMIN,EmployeeController,*
 MANAGER,EmployeeController,"getAllEmployees,getEmployeesPage,getEmployee,createEmployee,updateEmployee"
 EMPLOYEE,EmployeeController,getEmployee
