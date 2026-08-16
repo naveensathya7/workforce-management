@@ -51,9 +51,8 @@ public class AuthService {
                     new RuntimeException("User not found with username: " + request.getUsername()));
     final Map<String, Object> claims = Map.of("tv", user.getTokenVersion());
     final String jwtToken = jwtService.generateToken(claims, user);
-    final RefreshToken refreshToken =
-        refreshTokenService.createRefreshToken(user, request.getDeviceId());
-    return new AuthResponse(jwtToken, refreshToken.getToken());
+    final String refreshToken = refreshTokenService.createRefreshToken(user, request.getDeviceId());
+    return new AuthResponse(jwtToken, refreshToken);
   }
 
   @Transactional
@@ -122,9 +121,9 @@ public class AuthService {
     Map<String, Object> claims = Map.of("tv", user.getTokenVersion());
     String jwtToken = jwtService.generateToken(claims, user);
     // 3. Rotate: Delete old refresh token & generate a brand-new Refresh Token
-    RefreshToken newRefreshToken =
+    String newRefreshToken =
         refreshTokenService.createRefreshToken(user, refreshToken.getDeviceId());
-    return new AuthResponse(jwtToken, newRefreshToken.getToken());
+    return new AuthResponse(jwtToken, newRefreshToken);
   }
 
   @Transactional

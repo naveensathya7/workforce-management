@@ -419,6 +419,18 @@
 		</sql>
 	</changeSet>
 
+	<changeSet id="1.17-hash-existing-refresh-tokens"
+		author="naveen">
+		<sql>
+			CREATE EXTENSION IF NOT EXISTS pgcrypto;
+			UPDATE refresh_tokens
+			SET
+			token = encode(digest(token, 'sha256'), 'hex')
+			WHERE length(token)
+			&lt;&gt; 64;
+		</sql>
+	</changeSet>
+
 
 
 </databaseChangeLog>
