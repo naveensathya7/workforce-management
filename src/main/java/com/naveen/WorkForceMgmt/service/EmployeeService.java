@@ -48,6 +48,7 @@ public class EmployeeService {
     employeeRepo.save(employee);
   }
 
+  @Auditable(action = "UPDATE_EMPLOYEE")
   public void updateEmployee(Long empId, EmployeeDTO dto) {
     Employee employee =
         employeeRepo.findById(empId).orElseThrow(() -> new EmployeeNotFoundException(empId));
@@ -63,6 +64,7 @@ public class EmployeeService {
     employeeRepo.save(employee);
   }
 
+  @Auditable(action = "DELETE_EMPLOYEE")
   public void deleteEmployee(Long empId) {
     employeeRepo.deleteById(empId);
   }

@@ -16,4 +16,15 @@ public class ResetPasswordRequest {
   @NotBlank(message = "New password is required")
   @Size(min = 8, max = 16, message = "New password should be between 8 and 16 characters")
   private String newPassword;
+
+  /**
+   * Explicit override so the password is never logged — e.g. by the audit-logging aspect, which
+   * logs method arguments. Also blocks Lombok from generating a field-dumping toString()
+   * if @Data/@ToString is ever added to this class later, since Lombok skips generation when a
+   * toString() is already defined.
+   */
+  @Override
+  public String toString() {
+    return "ResetPasswordRequest{newPassword=[PROTECTED]}";
+  }
 }

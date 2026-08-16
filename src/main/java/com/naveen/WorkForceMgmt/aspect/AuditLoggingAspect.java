@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -29,19 +31,7 @@ public class AuditLoggingAspect {
     String actionName = auditable.action();
     String methodArgs = Arrays.toString(joinPoint.getArgs());
 
-    ServletRequestAttributes attributes =
-        (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-    String username = "SYSTEM/UNKNOWN";
-    if (attributes != null) {
-      HttpServletRequest request = attributes.getRequest();
-
-      String userHeader = request.getHeader("X-user-Id");
-      if (userHeader != null && !userHeader.isBlank()) {
-        username = userHeader;
-      } else {
-        username = "IP: " + request.getRemoteAddr();
-      }
-    }
+    String username = resolvePerformedBy();
 
     Object result;
 
@@ -64,5 +54,27 @@ public class AuditLoggingAspect {
       log.error("Failed action: {} due to {}", actionName, throwable.getMessage());
       throw throwable;
     }
+  }
+
+  /**
+   * Resolves who performed the action from the verified Spring Security context — never from a
+   * client-supplied header, which any caller could forge. Falls back to the caller's IP only when
+   * there's genuinely no authenticated principal (e.g. a failed login attempt).
+   */
+  private String resolvePerformedBy() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication != null
+        && authentication.isAuthenticated()
+        && !"anonymousUser".equals(authentication.getPrincipal())) {
+      return authentication.getName();
+    }
+
+    ServletRequestAttributes attributes =
+        (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+    if (attributes != null) {
+      HttpServletRequest request = attributes.getRequest();
+      return "IP: " + request.getRemoteAddr();
+    }
+    return "SYSTEM/UNKNOWN";
   }
 }
