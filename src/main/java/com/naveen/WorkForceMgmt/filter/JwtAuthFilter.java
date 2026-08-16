@@ -1,5 +1,6 @@
 package com.naveen.WorkForceMgmt.filter;
 
+import com.naveen.WorkForceMgmt.model.User;
 import com.naveen.WorkForceMgmt.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -50,7 +51,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-        if (jwtService.isTokenValid(jwt, userDetails)) {
+        if (jwtService.isTokenValid(jwt, userDetails) && isTokenVersionCurrent(jwt, userDetails)) {
           UsernamePasswordAuthenticationToken authToken =
               new UsernamePasswordAuthenticationToken(
                   userDetails, null, userDetails.getAuthorities());
@@ -72,5 +73,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     filterChain.doFilter(request, response);
+  }
+
+  private boolean isTokenVersionCurrent(String jwt, UserDetails userDetails) {
+    Integer tokenVersion = jwtService.extractClaim(jwt, claims -> claims.get("tv", Integer.class));
+    int currentVersion = ((User) userDetails).getTokenVersion();
+    return tokenVersion != null && tokenVersion == currentVersion;
   }
 }

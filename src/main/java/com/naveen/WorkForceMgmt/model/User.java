@@ -100,6 +100,11 @@ public class User implements UserDetails {
   @Builder.Default
   private boolean accountNonExpired = true;
 
+  /** Security version counter used for token invalidation */
+  @Column(name = "token_version", nullable = false)
+  @Builder.Default
+  private int tokenVersion = 0;
+
   // ─────────────────────────────────────────────────────────────
   // UserDetails contract — 7 methods Spring Security will call
   // ─────────────────────────────────────────────────────────────

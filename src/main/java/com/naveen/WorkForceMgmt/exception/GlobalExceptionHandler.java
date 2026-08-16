@@ -167,6 +167,47 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Triggered when an authenticated user is unauthorized to access the resource. Returns 403
+   * Forbidden.
+   */
+  @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+  public ResponseEntity<ErrorResponseDTO> handleUnauthorizedAccess(
+      org.springframework.security.access.AccessDeniedException ex) {
+
+    log.warn("Authorization failed: Access denied");
+
+    ErrorResponseDTO error =
+        new ErrorResponseDTO(
+            HttpStatus.FORBIDDEN.value(),
+            "Access Denied",
+            List.of(
+                "You do not have permission to perform this action. Please contact administrator."),
+            LocalDateTime.now());
+
+    return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+  }
+
+  /**
+   * Triggered when a request doesn't match any controller mapping (e.g. a typo'd URL or an extra
+   * path segment). Returns 404 Not Found instead of falling through to the generic 500 handler.
+   */
+  @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+  public ResponseEntity<ErrorResponseDTO> handleNoResourceFound(
+      org.springframework.web.servlet.resource.NoResourceFoundException ex) {
+
+    log.warn("No matching route: {}", ex.getMessage());
+
+    ErrorResponseDTO error =
+        new ErrorResponseDTO(
+            HttpStatus.NOT_FOUND.value(),
+            "Not Found",
+            List.of("The requested URL does not match any endpoint."),
+            LocalDateTime.now());
+
+    return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+  }
+
+  /**
    * Catch-all handler for any other unexpected runtime exceptions. Returns 500 Internal Server
    * Error.
    */

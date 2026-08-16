@@ -13,12 +13,11 @@ import com.naveen.WorkForceMgmt.model.User;
 import com.naveen.WorkForceMgmt.repository.EmployeeRepo;
 import com.naveen.WorkForceMgmt.repository.RoleRepository;
 import com.naveen.WorkForceMgmt.repository.UserRepository;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
   private final AuthenticationManager authenticationManager;
-  private final UserDetailsService userDetailsService;
   private final JwtService jwtService;
   private final EmployeeRepo employeeRepository;
   private final UserRepository userRepository;
@@ -41,15 +39,14 @@ public class AuthService {
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-    final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-    final String jwtToken = jwtService.generateToken(userDetails);
     final User user =
         userRepository
-            .findByUsername(userDetails.getUsername())
+            .findByUsername(request.getUsername())
             .orElseThrow(
                 () ->
-                    new RuntimeException(
-                        "User not found with username: " + userDetails.getUsername()));
+                    new RuntimeException("User not found with username: " + request.getUsername()));
+    final Map<String, Object> claims = Map.of("tv", user.getTokenVersion());
+    final String jwtToken = jwtService.generateToken(claims, user);
     final RefreshToken refreshToken =
         refreshTokenService.createRefreshToken(user, request.getDeviceId());
     return new AuthResponse(jwtToken, refreshToken.getToken());
@@ -94,6 +91,8 @@ public class AuthService {
 
     user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     userRepository.save(user);
+    userRepository.incrementTokenVersion(user.getId());
+    refreshTokenService.deleteByUser(user);
   }
 
   @Transactional
@@ -112,7 +111,8 @@ public class AuthService {
     }
     refreshTokenService.verifyExpiration(refreshToken);
     User user = refreshToken.getUser();
-    String jwtToken = jwtService.generateToken(user);
+    Map<String, Object> claims = Map.of("tv", user.getTokenVersion());
+    String jwtToken = jwtService.generateToken(claims, user);
     // 3. Rotate: Delete old refresh token & generate a brand-new Refresh Token
     RefreshToken newRefreshToken =
         refreshTokenService.createRefreshToken(user, refreshToken.getDeviceId());
@@ -129,5 +129,7 @@ public class AuthService {
 
     user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     userRepository.save(user);
+    userRepository.incrementTokenVersion(user.getId());
+    refreshTokenService.deleteByUser(user);
   }
 }
