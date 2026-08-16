@@ -4,7 +4,11 @@ import com.naveen.WorkForceMgmt.exception.InvalidRefreshTokenException;
 import com.naveen.WorkForceMgmt.model.RefreshToken;
 import com.naveen.WorkForceMgmt.model.User;
 import com.naveen.WorkForceMgmt.repository.RefreshTokenRepository;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.HexFormat;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +27,7 @@ public class RefreshTokenService {
   private long refreshExpirationMs;
 
   @Transactional
-  public RefreshToken createRefreshToken(User user, String deviceId) {
+  public String createRefreshToken(User user, String deviceId) {
     refreshTokenRepository
         .findByUserAndDeviceIdAndRevokedFalse(user, deviceId)
         .ifPresent(
@@ -33,22 +37,34 @@ public class RefreshTokenService {
             });
 
     refreshTokenRepository.flush();
+    String rawToken = UUID.randomUUID().toString();
 
     RefreshToken refreshToken =
         RefreshToken.builder()
             .user(user)
-            .token(UUID.randomUUID().toString())
+            .token(hashToken(rawToken))
             .expiryDate(Instant.now().plusMillis(refreshExpirationMs))
             .revoked(false)
             .deviceId(deviceId)
             .build();
 
-    return refreshTokenRepository.save(refreshToken);
+    refreshTokenRepository.save(refreshToken);
+    return rawToken;
   }
 
   @Transactional
-  public Optional<RefreshToken> findByToken(String token) {
-    return refreshTokenRepository.findByToken(token);
+  public Optional<RefreshToken> findByToken(String rawToken) {
+    return refreshTokenRepository.findByToken(hashToken(rawToken));
+  }
+
+  private String hashToken(String rawToken) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      byte[] hashBytes = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
+      return HexFormat.of().formatHex(hashBytes);
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException("SHA-256 is not available", e);
+    }
   }
 
   @Transactional
@@ -67,7 +83,7 @@ public class RefreshTokenService {
   }
 
   @Transactional
-  public void deleteByToken(String refreshToken) {
-    refreshTokenRepository.deleteByToken(refreshToken);
+  public void deleteByToken(String rawToken) {
+    refreshTokenRepository.deleteByToken(hashToken(rawToken));
   }
 }
