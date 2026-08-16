@@ -1,5 +1,6 @@
 package com.naveen.WorkForceMgmt.service;
 
+import com.naveen.WorkForceMgmt.exception.InvalidRefreshTokenException;
 import com.naveen.WorkForceMgmt.model.RefreshToken;
 import com.naveen.WorkForceMgmt.model.User;
 import com.naveen.WorkForceMgmt.repository.RefreshTokenRepository;
@@ -9,6 +10,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -22,7 +24,13 @@ public class RefreshTokenService {
 
   @Transactional
   public RefreshToken createRefreshToken(User user, String deviceId) {
-    refreshTokenRepository.deleteByUserAndDeviceId(user, deviceId);
+    refreshTokenRepository
+        .findByUserAndDeviceIdAndRevokedFalse(user, deviceId)
+        .ifPresent(
+            existing -> {
+              existing.setRevoked((true));
+              refreshTokenRepository.save(existing);
+            });
 
     refreshTokenRepository.flush();
 
@@ -47,13 +55,13 @@ public class RefreshTokenService {
   public RefreshToken verifyExpiration(RefreshToken token) {
     if (token.getExpiryDate().compareTo(Instant.now()) <= 0) {
       refreshTokenRepository.delete(token);
-      throw new RuntimeException("Refresh token was expired. Please log in again.");
+      throw new InvalidRefreshTokenException("Refresh token was expired. Please log in again.");
     }
     return token;
   }
 
   /** Deletes all refresh tokens for a user (useful during logout or password change). */
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void deleteByUser(User user) {
     refreshTokenRepository.deleteByUser(user);
   }

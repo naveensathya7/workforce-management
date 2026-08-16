@@ -7,6 +7,7 @@ import com.naveen.WorkForceMgmt.dto.LoginRequest;
 import com.naveen.WorkForceMgmt.dto.RefreshTokenRequest;
 import com.naveen.WorkForceMgmt.dto.RegisterRequest;
 import com.naveen.WorkForceMgmt.dto.ResetPasswordRequest;
+import com.naveen.WorkForceMgmt.exception.InvalidRefreshTokenException;
 import com.naveen.WorkForceMgmt.model.Employee;
 import com.naveen.WorkForceMgmt.model.RefreshToken;
 import com.naveen.WorkForceMgmt.model.Role;
@@ -16,6 +17,7 @@ import com.naveen.WorkForceMgmt.repository.RoleRepository;
 import com.naveen.WorkForceMgmt.repository.UserRepository;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -108,9 +111,11 @@ public class AuthService {
     RefreshToken refreshToken =
         refreshTokenService
             .findByToken(request.getRefreshToken())
-            .orElseThrow(() -> new RuntimeException("No Refresh token details found"));
+            .orElseThrow(() -> new InvalidRefreshTokenException("No Refresh token details found"));
     if (refreshToken.isRevoked()) {
-      throw new RuntimeException("Refresh token is revoked");
+      refreshTokenService.deleteByUser(refreshToken.getUser());
+      log.warn("Refresh token reuse detected for user {}", refreshToken.getUser().getUsername());
+      throw new InvalidRefreshTokenException("Refresh token reuse detected. Please log in again.");
     }
     refreshTokenService.verifyExpiration(refreshToken);
     User user = refreshToken.getUser();

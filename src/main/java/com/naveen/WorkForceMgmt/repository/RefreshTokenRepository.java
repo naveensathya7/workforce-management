@@ -12,6 +12,8 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
 
   Optional<RefreshToken> findByToken(String token);
 
+  Optional<RefreshToken> findByUserAndDeviceIdAndRevokedFalse(User user, String deviceId);
+
   @Modifying
   void deleteByUser(User user);
 

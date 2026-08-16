@@ -394,6 +394,31 @@
 			</column>
 		</addColumn>
 	</changeSet>
+	<changeSet
+		id="1.15-drop-refresh-token-user-device-constraint" author="naveen"
+		runOnChange="true">
+		<preConditions onFail="MARK_RAN">
+			<indexExists indexName="uq_refresh_token_user_device" />
+		</preConditions>
+		<dropUniqueConstraint tableName="refresh_tokens"
+			constraintName="uq_refresh_token_user_device" />
+	</changeSet>
+	<changeSet id="1.16-refresh-token-active-partial-index"
+		author="naveen">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists
+					indexName="uq_refresh_token_user_device_active" />
+			</not>
+		</preConditions>
+		<sql>
+			CREATE UNIQUE INDEX uq_refresh_token_user_device_active
+			ON
+			refresh_tokens (user_id, device_id)
+			WHERE revoked = false;
+		</sql>
+	</changeSet>
+
 
 
 </databaseChangeLog>

@@ -166,6 +166,23 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
   }
 
+  /** Triggered when a refresh token is missing, expired, or reused. Returns 401 Unauthorized. */
+  @ExceptionHandler(InvalidRefreshTokenException.class)
+  public ResponseEntity<ErrorResponseDTO> handleInvalidRefreshToken(
+      InvalidRefreshTokenException ex) {
+
+    log.warn("Refresh token rejected: {}", ex.getMessage());
+
+    ErrorResponseDTO error =
+        new ErrorResponseDTO(
+            HttpStatus.UNAUTHORIZED.value(),
+            "Invalid Refresh Token",
+            List.of(ex.getMessage()),
+            LocalDateTime.now());
+
+    return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+  }
+
   /**
    * Triggered when an authenticated user is unauthorized to access the resource. Returns 403
    * Forbidden.
