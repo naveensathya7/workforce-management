@@ -26,4 +26,21 @@ public class RegisterRequest {
 
   @NotNull(message = "Employee ID is required")
   private Long employeeId;
+
+  /**
+   * Explicit override so the password is never logged — e.g. by the audit-logging aspect, which
+   * logs method arguments. Also blocks Lombok from generating a field-dumping toString()
+   * if @Data/@ToString is ever added to this class later, since Lombok skips generation when a
+   * toString() is already defined.
+   */
+  @Override
+  public String toString() {
+    return "RegisterRequest{username="
+        + username
+        + ", password=[PROTECTED], roleName="
+        + roleName
+        + ", employeeId="
+        + employeeId
+        + "}";
+  }
 }

@@ -1,5 +1,6 @@
 package com.naveen.WorkForceMgmt.service;
 
+import com.naveen.WorkForceMgmt.annotation.Auditable;
 import com.naveen.WorkForceMgmt.dto.ProjectDTO;
 import com.naveen.WorkForceMgmt.exception.ProjectNotFoundException;
 import com.naveen.WorkForceMgmt.mapper.ProjectMapper;
@@ -26,11 +27,13 @@ public class ProjectService {
         .orElseThrow(() -> new ProjectNotFoundException(projectId));
   }
 
+  @Auditable(action = "CREATE_PROJECT")
   public void createProject(ProjectDTO dto) {
     Project project = projectMapper.toEntity(dto);
     projectRepo.save(project);
   }
 
+  @Auditable(action = "UPDATE_PROJECT")
   public void updateProject(Long projectId, ProjectDTO dto) {
     Project existing =
         projectRepo.findById(projectId).orElseThrow(() -> new ProjectNotFoundException(projectId));
@@ -39,6 +42,7 @@ public class ProjectService {
     projectRepo.save(existing);
   }
 
+  @Auditable(action = "DELETE_PROJECT")
   public void deleteProject(Long projectId) {
     if (!projectRepo.existsById(projectId)) {
       throw new ProjectNotFoundException(projectId);

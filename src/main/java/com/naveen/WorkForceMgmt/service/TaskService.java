@@ -1,5 +1,6 @@
 package com.naveen.WorkForceMgmt.service;
 
+import com.naveen.WorkForceMgmt.annotation.Auditable;
 import com.naveen.WorkForceMgmt.dto.TaskDTO;
 import com.naveen.WorkForceMgmt.exception.EmployeeNotFoundException;
 import com.naveen.WorkForceMgmt.exception.ProjectNotFoundException;
@@ -42,6 +43,7 @@ public class TaskService {
     return taskRepo.findByAssignedEmployeeId(employeeId);
   }
 
+  @Auditable(action = "CREATE_TASK")
   public void createTask(TaskDTO dto) {
     // Validate that both the employee and project actually exist
     Employee employee =
@@ -60,6 +62,7 @@ public class TaskService {
     taskRepo.save(task);
   }
 
+  @Auditable(action = "UPDATE_TASK")
   public void updateTask(Long taskId, TaskDTO dto) {
     Task existing = taskRepo.findById(taskId).orElseThrow(() -> new TaskNotFoundException(taskId));
 
@@ -79,6 +82,7 @@ public class TaskService {
     taskRepo.save(existing);
   }
 
+  @Auditable(action = "DELETE_TASK")
   public void deleteTask(Long taskId) {
     if (!taskRepo.existsById(taskId)) {
       throw new TaskNotFoundException(taskId);

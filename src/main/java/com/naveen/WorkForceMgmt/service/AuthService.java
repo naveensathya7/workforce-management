@@ -1,5 +1,6 @@
 package com.naveen.WorkForceMgmt.service;
 
+import com.naveen.WorkForceMgmt.annotation.Auditable;
 import com.naveen.WorkForceMgmt.dto.AuthResponse;
 import com.naveen.WorkForceMgmt.dto.ChangePasswordRequest;
 import com.naveen.WorkForceMgmt.dto.LoginRequest;
@@ -53,6 +54,7 @@ public class AuthService {
   }
 
   @Transactional
+  @Auditable(action = "REGISTER_USER")
   public void register(RegisterRequest request) {
     Employee employee =
         employeeRepository
@@ -78,6 +80,7 @@ public class AuthService {
   }
 
   @Transactional
+  @Auditable(action = "CHANGE_PASSWORD")
   public void changePassword(String username, ChangePasswordRequest request) {
     User user =
         userRepository
@@ -120,6 +123,7 @@ public class AuthService {
   }
 
   @Transactional
+  @Auditable(action = "RESET_PASSWORD")
   public void resetPassword(String username, ResetPasswordRequest request) {
     User user =
         userRepository
