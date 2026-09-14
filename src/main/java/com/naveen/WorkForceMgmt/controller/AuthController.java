@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,6 +32,7 @@ public class AuthController {
   }
 
   @PostMapping("/register")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
     authService.register(request);
     return ResponseEntity.ok("User registered successfully");
@@ -61,6 +63,7 @@ public class AuthController {
 
   /** ADMIN users can reset the password for any given user. */
   @PutMapping("/reset-password/{username}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<String> resetPassword(
       @PathVariable String username, @Valid @RequestBody ResetPasswordRequest request) {
     authService.resetPassword(username, request);
