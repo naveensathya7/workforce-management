@@ -16,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -64,6 +65,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());
       response.setContentType("application/json");
       response.getWriter().write("{\"error\": \"JWT token has expired. Please log in again.\"}");
+      return;
+    } catch (UsernameNotFoundException e) {
+      response.setStatus(HttpStatus.UNAUTHORIZED.value());
+      response.setContentType("application/json");
+      response.getWriter().write("{\"error\": \"Invalid JWT token.\"}");
       return;
     } catch (JwtException e) {
       response.setStatus(HttpStatus.UNAUTHORIZED.value());

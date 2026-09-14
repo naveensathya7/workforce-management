@@ -7,7 +7,9 @@ import com.naveen.WorkForceMgmt.dto.LoginRequest;
 import com.naveen.WorkForceMgmt.dto.RefreshTokenRequest;
 import com.naveen.WorkForceMgmt.dto.RegisterRequest;
 import com.naveen.WorkForceMgmt.dto.ResetPasswordRequest;
+import com.naveen.WorkForceMgmt.exception.EmployeeNotFoundException;
 import com.naveen.WorkForceMgmt.exception.InvalidRefreshTokenException;
+import com.naveen.WorkForceMgmt.exception.RoleNotFoundException;
 import com.naveen.WorkForceMgmt.model.Employee;
 import com.naveen.WorkForceMgmt.model.RefreshToken;
 import com.naveen.WorkForceMgmt.model.Role;
@@ -48,7 +50,8 @@ public class AuthService {
             .findByUsername(request.getUsername())
             .orElseThrow(
                 () ->
-                    new RuntimeException("User not found with username: " + request.getUsername()));
+                    new UsernameNotFoundException(
+                        "User not found with username: " + request.getUsername()));
     final Map<String, Object> claims = Map.of("tv", user.getTokenVersion());
     final String jwtToken = jwtService.generateToken(claims, user);
     final String refreshToken = refreshTokenService.createRefreshToken(user, request.getDeviceId());
@@ -61,14 +64,12 @@ public class AuthService {
     Employee employee =
         employeeRepository
             .findById(request.getEmployeeId())
-            .orElseThrow(
-                () ->
-                    new RuntimeException("Employee not found with ID: " + request.getEmployeeId()));
+            .orElseThrow(() -> new EmployeeNotFoundException(request.getEmployeeId()));
 
     Role role =
         roleRepository
             .findByName(request.getRoleName())
-            .orElseThrow(() -> new RuntimeException("Role not found: " + request.getRoleName()));
+            .orElseThrow(() -> new RoleNotFoundException(request.getRoleName()));
 
     User user =
         User.builder()

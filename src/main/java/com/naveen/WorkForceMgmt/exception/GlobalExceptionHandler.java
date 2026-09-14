@@ -127,6 +127,42 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
   }
 
+  /** Triggered when the requested role does not exist. Returns 404 Not Found. */
+  @ExceptionHandler(RoleNotFoundException.class)
+  public ResponseEntity<ErrorResponseDTO> handleRoleNotFound(RoleNotFoundException ex) {
+
+    log.warn("Role not found: {}", ex.getMessage());
+
+    ErrorResponseDTO error =
+        new ErrorResponseDTO(
+            HttpStatus.NOT_FOUND.value(),
+            "Role Not Found",
+            List.of(ex.getMessage()),
+            LocalDateTime.now());
+
+    return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+  }
+
+  /**
+   * Triggered when a JWT or login refers to a username that no longer exists. Returns 404 Not Found
+   * instead of 500 Internal Server Error.
+   */
+  @ExceptionHandler(org.springframework.security.core.userdetails.UsernameNotFoundException.class)
+  public ResponseEntity<ErrorResponseDTO> handleUsernameNotFound(
+      org.springframework.security.core.userdetails.UsernameNotFoundException ex) {
+
+    log.warn("Username not found: {}", ex.getMessage());
+
+    ErrorResponseDTO error =
+        new ErrorResponseDTO(
+            HttpStatus.NOT_FOUND.value(),
+            "User Not Found",
+            List.of(ex.getMessage()),
+            LocalDateTime.now());
+
+    return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+  }
+
   /**
    * Triggered when authentication fails due to incorrect username or password. Returns 401
    * Unauthorized instead of 500 Internal Server Error.
