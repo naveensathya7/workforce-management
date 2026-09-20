@@ -41,8 +41,18 @@ public class RateLimiterFilter extends OncePerRequestFilter {
       synchronized (timeStamps) {
         timeStamps.removeIf(timeStamp -> (currentTime - timeStamp) > timeWindowMs);
 
+        // When the oldest request in the window falls out is when a slot frees up again.
+        long resetAtMs =
+            timeStamps.isEmpty() ? currentTime + timeWindowMs : timeStamps.get(0) + timeWindowMs;
+
         if (timeStamps.size() >= maxAttempts) {
+          long retryAfterSeconds = Math.max(0, (resetAtMs - currentTime + 999) / 1000);
+
           response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+          response.setHeader("X-RateLimit-Limit", String.valueOf(maxAttempts));
+          response.setHeader("X-RateLimit-Remaining", "0");
+          response.setHeader("X-RateLimit-Reset", String.valueOf(resetAtMs / 1000));
+          response.setHeader("Retry-After", String.valueOf(retryAfterSeconds));
           response.setContentType("application/json");
           response
               .getWriter()
@@ -50,7 +60,13 @@ public class RateLimiterFilter extends OncePerRequestFilter {
                   "{\"error\": \"Too many requests to this endpoint. Please try again in 1 minute.\"}");
           return;
         }
+
         timeStamps.add(currentTime);
+
+        int remaining = Math.max(0, maxAttempts - timeStamps.size());
+        response.setHeader("X-RateLimit-Limit", String.valueOf(maxAttempts));
+        response.setHeader("X-RateLimit-Remaining", String.valueOf(remaining));
+        response.setHeader("X-RateLimit-Reset", String.valueOf(resetAtMs / 1000));
       }
     }
     filterChain.doFilter(request, response);
